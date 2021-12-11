@@ -12,6 +12,7 @@ import logging
 class LEDSControl:
 
     size: int
+    strip_size: int = 64
     initial_tuple: Tuple[int,int,int] = (0,0,0)
     __tablero: List[Tuple[int,int,int]] = field(default_factory = list,init=False,repr=False)
     strips_order: List[int] = field(default_factory=list,init=False)
@@ -53,11 +54,33 @@ class LEDSControl:
     def setPixel(self,pos: int, value: Tuple[int,int,int]) -> Tuple[int,int,int]:
         """Cambia el valor del pixel y devuelve el nuevo valor"""
 
-        LEDSControl.log.debug(f'Pixel {pos} a valor {value}')
-        self.__tablero[pos] = value
-        return self.__tablero[pos]
+        # LEDSControl.log.debug(f'Pixel {pos} a valor {value}')
+        
+        nPos = self.__conversor_posicion(pos)
+        self.__tablero[nPos] = value
+        return self.__tablero[nPos]
+    
+    def setTableroToPixel(self,pixel: Tuple[int,int,int]) -> None:
+        """Limpia el tablero completo a un color determinado"""
+        self.__tablero = [pixel for _ in range(0,self.size)]
+    
+    def __conversor_posicion(self,position: int) -> int:
+        """Devuelve la posicion reconvertida según las tiras en los canales"""
+        strip_correspondiente: int  = position // self.strip_size 
+
+        channel_strip: int = self.strips_order[strip_correspondiente]
+
+        newPosition: int = (position - (strip_correspondiente * self.strip_size)) + (channel_strip * self.strip_size)
+
+        LEDSControl.log.debug(f'Pos: {position}, tira: {strip_correspondiente}, reasignado a {channel_strip}, posicion devuelta: {newPosition}')
+
+        # ## ELIMINAR CUANDO SE TERMINE LA DEPURACION
+        # newPosition = position
+
+        return newPosition
 
     def getPixel(self,pos: int) -> Tuple[int,int,int]:
         """Devuelve el valor del pixel en la posición indicada"""
 
-        return self.__tablero[pos]
+        nPos = self.__conversor_posicion(pos)
+        return self.__tablero[nPos]
