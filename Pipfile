@@ -3,11 +3,16 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[scripts]
+launch = 'python launch.py'
+
 [packages]
-pytest = "*"
-pylint = "*"
+rich = "*"
+pyyaml = "*"
 
 [dev-packages]
+pytest = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.9"
